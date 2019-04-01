@@ -1,0 +1,3 @@
+A text file that has some text inside of it can be referred to as a "text file". The term "text file", also
+refers to a file with a "txt" extension. This is a text file that has words, punctuation, and carriage returns.
+The length of this file is some amount of bytes that.
