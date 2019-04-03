@@ -16,47 +16,38 @@ defmodule Extorrent.Torrent.Control do
 
   @check_wait_time 3000
 
-  @spec start_link(pid, binary) :: GenServer.on_start()
   def start_link(sup_pid, info_hash) do
     GenServer.start_link(__MODULE__, [sup_pid, info_hash])
   end
 
-  @spec add_peers(pid, binary) :: :ok
   def add_peers(pid, peers) do
     GenServer.cast(pid, {:add_peers, peers})
   end
 
-  @spec add_peer_control_pid(pid, pid) :: :ok
   def add_peer_control_pid(pid, peer_control_pid) do
     GenServer.cast(pid, {:peer_control_pid, peer_control_pid})
   end
 
-  @spec get_bitfield(pid) :: MapSet.t()
   def get_bitfield(pid) do
     GenServer.call(pid, :get_bitfield)
   end
 
-  @spec next_piece(pid, MapSet.t()) :: {:ok, non_neg_integer, non_neg_integer} | {:error, term}
   def next_piece(pid, bitfield) do
     GenServer.call(pid, {:next_piece, bitfield})
   end
 
-  @spec notify_saved(pid, non_neg_integer) :: :ok
   def notify_saved(pid, index) do
     GenServer.cast(pid, {:saved, index})
   end
 
-  @spec find_peers(pid) :: :ok
   def find_peers(pid) do
     GenServer.cast(pid, :find_peers)
   end
 
-  @spec failed_piece(pid, non_neg_integer) :: :ok
   def failed_piece(pid, index) do
     GenServer.cast(pid, {:failed_piece, index})
   end
 
-  @spec get_num_pieces(pid) :: non_neg_integer
   def get_num_pieces(pid) do
     GenServer.call(pid, :num_pieces)
   end
@@ -109,7 +100,6 @@ defmodule Extorrent.Torrent.Control do
     end
   end
 
-  @impl true
   def handle_call(:get_bitfield, _from, %{bitfield: bitfield} = state) do
     {:reply, bitfield, state}
   end
@@ -137,23 +127,19 @@ defmodule Extorrent.Torrent.Control do
     end
   end
 
-  @impl true
   def handle_call(:num_pieces, _from, %{num_pieces: num_pieces} = state) do
     {:reply, num_pieces, state}
   end
 
-  @impl true
   def handle_cast({:add_peers, peers}, %{peer_control_pid: nil} = state) do
     {:noreply, Map.update!(state, :peers, &(&1 <> peers))}
   end
 
-  @impl true
   def handle_cast({:add_peers, peers}, %{peer_control_pid: pid} = state) do
     PeerControl.add_peers(pid, peers)
     {:noreply, state}
   end
 
-  @impl true
   def handle_cast({:peer_control_pid, pid}, %{peers: peers} = state) do
     case peers do
       <<>> ->
@@ -165,7 +151,6 @@ defmodule Extorrent.Torrent.Control do
     end
   end
 
-  @impl true
   def handle_cast({:saved, index}, %{bitfield: bitfield, downloading: downloading} = state) do
     PeerControl.notify_saved(state.peer_control_pid, index)
     bitfield = MapSet.put(bitfield, index)
@@ -178,7 +163,6 @@ defmodule Extorrent.Torrent.Control do
     {:noreply, %{state | bitfield: bitfield, downloading: downloading, have: state.have + 1}}
   end
 
-  @impl true
   def handle_cast(:find_peers, %{tracker_pid: pid} = state) do
     Tracker.find_peers(pid)
 
@@ -190,12 +174,10 @@ defmodule Extorrent.Torrent.Control do
     {:noreply, %{state | downloading: MapSet.delete(downloading, index)}}
   end
 
-  @impl true
   def handle_info(:timeout, %{status: :initializing} = state) do
     {:noreply, state, {:continue, :initialize}}
   end
 
-  @impl true
   def handle_info({ref, bitfield}, %{info_hash: info_hash, sup_pid: sup_pid} = state) do
     {:ok, tracker_pid} = TorrentSupervisor.add_tracker(sup_pid, info_hash, self())
     {:ok, file_worker} = TorrentSupervisor.start_file_worker(sup_pid, info_hash, bitfield, self())
@@ -221,12 +203,10 @@ defmodule Extorrent.Torrent.Control do
     {:noreply, state}
   end
 
-  @spec check_torrent(binary) :: MapSet.t()
   defp check_torrent(info_hash) do
     FileUtils.check_torrent(info_hash)
   end
 
-  @spec calculate_size_on_disk(MapSet.t(), map) :: integer
   defp calculate_size_on_disk(bitfield, state) do
     count = bitfield |> Enum.to_list() |> length
 

@@ -6,14 +6,13 @@ defmodule ExtorrentWeb.PageController do
     render(conn, "index.html")
   end
 
-  @spec add(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def add(conn, %{"torrent" => torrent}) do
     case Extorrent.add_torrent(torrent.path) do
       {:error, reason} ->
-        render(conn, "add.json", %{success: reason, token: get_csrf_token()})
+        render(conn, "add.json", %{success: reason})
 
       _ ->
-        render(conn, "add.json", %{success: :ok, token: get_csrf_token()})
+        render(conn, "add.json", %{success: :ok})
     end
   end
 end

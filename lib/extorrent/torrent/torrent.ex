@@ -36,7 +36,7 @@ defmodule Extorrent.Torrent do
          {:ok, pieces} <- Map.fetch(info, "pieces"),
          {:ok, piece_length} <- Map.fetch(info, "piece length"),
          {:ok, trackers} <- get_trackers(torrent) do
-      download_dir = Application.get_env(:Extorrent, :download_dir)
+      download_dir = Application.get_env(:extorrent, :download_dir)
       files = get_files(info, Path.join(download_dir, name))
       size = Enum.reduce(files, 0, fn {_name, length}, total -> length + total end)
       piece_map = get_piece_map(piece_length, files, get_hashes(pieces))
@@ -59,7 +59,7 @@ defmodule Extorrent.Torrent do
     end
   end
 
-  ## Private functions
+  ## Private functions ##
 
   @spec get_files(map, Path.t()) :: [{Path.t(), non_neg_integer}]
   defp get_files(%{"files" => files}, name) do
