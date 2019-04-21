@@ -154,6 +154,7 @@ defmodule Extorrent.Torrent.Table do
     {:reply, make_init_payload(state), %{state | subscribers: subs}}
   end
 
+  @impl true
   def handle_cast({:size_on_disk, info_hash, size}, %{torrents: torrents} = state) do
     with {:ok, {pid, torrent}} <- find_torrent(state, info_hash, :noreply) do
       torrent = %Torrent{torrent | left: torrent.size - size}
@@ -186,6 +187,7 @@ defmodule Extorrent.Torrent.Table do
     end
   end
 
+  @impl true
   def handle_info(:send_update, state) do
     state = notify_speed(state)
     Process.send_after(self(), :send_update, 1_000)

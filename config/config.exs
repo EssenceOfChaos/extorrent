@@ -31,6 +31,13 @@ config :extorrent,
   udp_port: Enum.random(21_001..22_000),
   download_dir: System.get_env("HOME") |> Path.join("Downloads")
 
+# Configure your database
+config :extorrent, Extorrent.Repo,
+  username: "postgres",
+  password: "postgres",
+  database: "extorrent_prod",
+  pool_size: 15
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 

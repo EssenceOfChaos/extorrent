@@ -18,6 +18,8 @@ defmodule ExtorrentWeb.Router do
 
     get("/", PageController, :index)
     post("/add", PageController, :add)
+    get "/torrents", TorrentController, :status
+    # resources "/torrents", TorrentController
   end
 
   # Other scopes may use custom stacks.

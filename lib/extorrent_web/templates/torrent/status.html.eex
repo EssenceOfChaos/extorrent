@@ -1,0 +1,3 @@
+<h1>Current status</h1>
+<p>Excellent  <i class="material-icons green">check_circle</i></p>
+<p>The current server time is <%= @dt %> </p>
